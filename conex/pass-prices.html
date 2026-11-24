@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a pass costs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: a single price axis ($0 to $6K+) with one row per event; the ConEx band sits behind the rows. Tokens mirror explori.com/conex. */
+:root{
+  --bg:#0A0F1E; --panel:#10172B; --line:rgba(148,163,210,.16); --fg:#E9EEFA; --muted:#8E9AC0;
+  --teal:#33E1D5; --violet:#725AFF; --grad:linear-gradient(90deg,#725AFF,#33E1D5);
+  --display:'Poppins',ui-sans-serif,system-ui,sans-serif; --body:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --label:220px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding-block:8px 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:600 12px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+h2{font:700 clamp(22px,3.2vw,32px)/1.15 var(--display);margin:10px 0 6px;text-wrap:balance;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 22px;font-size:15px;line-height:1.5;max-width:62ch}
+.chart{position:relative;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:22px 22px 14px}
+.grid{position:relative}
+.band{position:absolute;top:0;bottom:0;background:linear-gradient(180deg,rgba(51,225,213,.10),rgba(114,90,255,.06));border-left:1px dashed rgba(51,225,213,.6);border-right:1px dashed rgba(51,225,213,.6);border-radius:6px;transform-origin:left;transition:transform 1s cubic-bezier(.2,.7,.2,1),opacity .6s}
+.bandlabel{position:absolute;top:-2px;transform:translateY(-100%);font:600 11px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--teal);white-space:nowrap;padding-bottom:6px}
+.row{display:grid;grid-template-columns:var(--label) 1fr;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer;position:relative;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;color:inherit;font:inherit}
+.row:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:8px}
+.row:last-of-type{border-bottom:0}
+.name{font:600 15px/1.3 var(--display)}
+.kind{display:block;font:400 12px/1.3 var(--body);color:var(--muted);margin-top:3px}
+.track{position:relative;height:30px}
+.bar{position:absolute;top:7px;height:16px;border-radius:999px;background:var(--grad);transform-origin:left;transform:scaleX(0);transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.bar.flat{background:#8E9AC0}
+.dot{position:absolute;top:7px;width:16px;height:16px;border-radius:50%;background:#8E9AC0;transform:scale(0);transition:transform .6s .2s}
+.tick{position:absolute;top:3px;width:2px;height:24px;background:#fff;border-radius:2px;opacity:0;transition:opacity .4s 1s}
+.val{position:absolute;top:5px;font:600 13px/20px var(--body);color:var(--fg);white-space:nowrap;opacity:0;transition:opacity .4s .9s;font-variant-numeric:tabular-nums}
+.on .bar{transform:scaleX(1)} .on .dot{transform:scale(1)} .on .tick,.on .val{opacity:1}
+.axis{display:grid;grid-template-columns:var(--label) 1fr;gap:16px;margin-top:6px}
+.ticks{position:relative;height:24px;color:var(--muted);font:500 12px/1 var(--body);font-variant-numeric:tabular-nums}
+.ticks span{position:absolute;top:8px;transform:translateX(-50%)}
+.detail{margin-top:18px;border-left:2px solid var(--teal);padding:2px 0 2px 16px;min-height:66px}
+.detail p{margin:0;font:500 16px/1.5 var(--display);max-width:64ch}
+.detail small{display:block;margin-top:6px;color:var(--muted);font:400 12px/1.4 var(--body)}
+.row[aria-pressed="true"] .name{color:var(--teal)}
+.note{margin-top:14px;color:var(--muted);font-size:12px}
+@media (max-width:640px){
+  :root{--label:0px}
+  .row{grid-template-columns:1fr;gap:6px}
+  .axis{grid-template-columns:1fr;gap:0}
+  .axis>div:first-child{display:none}
+  .chart{padding:18px 14px 10px}
+  .band{display:none}
+}
+@media (prefers-reduced-motion:reduce){.bar,.dot,.tick,.val,.band{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Chapter 3 · An altogether different model</div>
+  <h2>What it costs to get in the room</h2>
+  <p class="sub">Most typical trade shows are free to enter. ConEx delegate passes come at a premium, anything from around $500 to $6K+. Tap a row for the detail.</p>
+  <div class="chart" id="chart">
+    <div class="grid" id="grid">
+      <button class="row" data-i="0" aria-pressed="true"><span><span class="name">Typical trade show</span><span class="kind">Open hall</span></span><span class="track"><span class="dot" style="left:0"></span><span class="val" style="left:24px">Free or nominal</span></span></button>
+      <button class="row" data-i="1" aria-pressed="false"><span><span class="name">Connectiv events</span><span class="kind">e.g. Medicarians, Manifest</span></span><span class="track"><span class="bar" data-min="1000" data-max="2000"></span><span class="val" data-at="2000">$1K–$2K</span></span></button>
+      <button class="row" data-i="2" aria-pressed="false"><span><span class="name">Money20/20 USA</span><span class="kind">Fintech</span></span><span class="track"><span class="bar" data-min="1500" data-max="6000"></span><span class="tick" data-at="4050" title="Standard pass"></span><span class="val" data-at="6000">$1.5K–$6K</span></span></button>
+      <button class="row" data-i="3" aria-pressed="false"><span><span class="name">Ai4</span><span class="kind">CloserStill · AI</span></span><span class="track"><span class="bar" data-min="2000" data-max="6000"></span><span class="val" data-at="6000">$2K–$6K</span></span></button>
+    </div>
+    <div class="axis"><div></div><div class="ticks" id="ticks"></div></div>
+  </div>
+  <div class="detail" id="detail" aria-live="polite"><p></p><small></small></div>
+  <div class="note">Prices as reported in The emergence of the ConEx. The white mark on Money20/20 is the standard pass.</div>
+</div>
+<script>
+(()=>{
+const MAX=6600; // axis runs a little past $6K so the "+" has room
+const pct=v=>v/MAX*100;
+const details=[
+  ["Usually there is no charge or a nominal entry fee for attendees.","Distinctions between trade shows and ConExs"],
+  ["Jay Weintraub’s shows are $1-2K to attend.","Chapter 3"],
+  ["According to the Money20/20 website, passes for Money20/20 USA range from around $1,500 to $6,000, with the standard pass at just over $4,000.","Chapter 3"],
+  ["With breakfasts, lunches, summits, meetups, training and after-parties, the delegate pass is anywhere between $2K and $6K.","Phil Soar on Ai4, chapter 3"]
+];
+const grid=document.getElementById('grid'),rows=[...grid.querySelectorAll('.row')];
+// place bars, ticks and values on the shared scale
+grid.querySelectorAll('.bar').forEach((b,i)=>{const mn=+b.dataset.min,mx=+b.dataset.max;b.style.left=pct(mn)+'%';b.style.width=(pct(mx)-pct(mn))+'%';b.style.transitionDelay=(.15+i*.18)+'s';});
+grid.querySelectorAll('.tick').forEach(t=>t.style.left=`calc(${pct(+t.dataset.at)}% - 1px)`);
+grid.querySelectorAll('.val[data-at]').forEach(v=>{const at=+v.dataset.at;if(at>=5000){v.style.right=`calc(${100-pct(at)}% + 0px)`;v.style.top='-16px';v.style.fontSize='12px';}else{v.style.left=`calc(${pct(at)}% + 10px)`;}});
+// ConEx band: $500 to $6K+
+const band=document.createElement('div');band.className='band';
+const lab=document.createElement('div');lab.className='bandlabel';lab.textContent='ConEx passes: around $500 to $6K+';band.appendChild(lab);
+grid.appendChild(band);
+function placeBand(){const narrow=innerWidth<=640;const labelW=narrow?0:220+16;const w=grid.clientWidth-labelW;band.style.left=(labelW+w*pct(500)/100)+'px';band.style.width=(w*(pct(MAX)-pct(500))/100)+'px';band.style.top='14px';}
+placeBand();addEventListener('resize',placeBand);
+band.style.transform='scaleX(0)';
+// axis ticks
+const tk=document.getElementById('ticks');[0,1000,2000,3000,4000,5000,6000].forEach(v=>{const s=document.createElement('span');s.style.left=pct(v)+'%';s.textContent=v?`$${v/1000}K${v===6000?'+':''}`:'$0';tk.appendChild(s);});
+// detail panel
+const dp=document.querySelector('#detail p'),ds=document.querySelector('#detail small');
+function pick(i){rows.forEach((r,j)=>r.setAttribute('aria-pressed',j===i));dp.textContent='“'+details[i][0]+'”';ds.textContent='The emergence of the ConEx · '+details[i][1];}
+rows.forEach((r,i)=>{r.addEventListener('click',()=>pick(i));r.addEventListener('mouseenter',()=>pick(i));});
+pick(0);
+// reveal when visible
+const go=()=>{grid.classList.add('on');band.style.transform='scaleX(1)';};
+if(matchMedia('(prefers-reduced-motion: reduce)').matches)go();
+else new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){setTimeout(go,250);o.disconnect();}}),{threshold:.35}).observe(grid);
+const post=()=>{try{parent.postMessage({source:'conex-visual',id:'pass-prices',height:document.documentElement.scrollHeight},'*')}catch(e){}};
+new ResizeObserver(post).observe(document.body);post();
+})();
+</script>
+</body>
+</html>

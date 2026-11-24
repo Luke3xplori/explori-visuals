@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From space to outcomes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one stage (canvas) with a mode switch beneath it and two captions that trade places. Tokens mirror explori.com/conex. */
+:root{
+  --bg:#0A0F1E; --panel:#10172B; --line:rgba(148,163,210,.16); --fg:#E9EEFA; --muted:#8E9AC0;
+  --teal:#33E1D5; --violet:#725AFF; --grad:linear-gradient(135deg,#725AFF,#33E1D5);
+  --display:'Poppins',ui-sans-serif,system-ui,sans-serif; --body:'Inter',ui-sans-serif,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding-block:8px 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:600 12px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+h2{font:700 clamp(22px,3.2vw,32px)/1.15 var(--display);margin:10px 0 18px;text-wrap:balance;letter-spacing:-.01em}
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;background:radial-gradient(120% 90% at 85% 10%,rgba(114,90,255,.14),transparent 60%),var(--panel);overflow:hidden}
+canvas{display:block;width:100%}
+.mode{position:absolute;left:14px;top:12px;font:600 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:16px}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:var(--panel);border:1px solid var(--line)}
+.seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 14px/1 var(--body);padding:10px 16px;border-radius:999px;cursor:pointer;transition:color .2s}
+.seg button[aria-pressed="true"]{background:var(--grad);color:#fff}
+.seg button:focus-visible,input[type=range]:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.scrub{flex:1 1 220px;display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+input[type=range]{flex:1;accent-color:var(--teal)}
+.captions{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.cap{border:1px solid var(--line);border-radius:14px;padding:16px 18px;transition:opacity .4s,border-color .4s;min-width:0}
+.cap h3{font:600 16px/1.3 var(--display);margin:0 0 8px}
+.cap ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.55}
+.cap.on{border-color:rgba(51,225,213,.55)}
+.cap.off{opacity:.45}
+blockquote{margin:22px 0 0;padding:0 0 0 16px;border-left:2px solid var(--teal);font:500 17px/1.5 var(--display);max-width:62ch}
+blockquote cite{display:block;margin-top:8px;font:400 13px/1.4 var(--body);color:var(--muted);font-style:normal}
+@media (max-width:620px){.mode{display:none}.captions{grid-template-columns:1fr}.seg button{padding:9px 12px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="root">
+  <div class="eyebrow">Chapter 2 · A different philosophy</div>
+  <h2>From selling space to curating outcomes</h2>
+  <div class="stage">
+    <canvas id="c" aria-label="Animated diagram. A trade show floorplan of stands and aisles turns into a curated room of meetings, roundtables, dinners, activations and sessions, linked by connections." role="img"></canvas>
+    <div class="mode" id="modeLabel">The hall plan</div>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Choose a model">
+      <button id="bA" aria-pressed="true">Trade show</button>
+      <button id="bB" aria-pressed="false">ConEx</button>
+    </div>
+    <label class="scrub" for="t">Space <input id="t" type="range" min="0" max="1000" value="0"> Outcomes</label>
+  </div>
+  <div class="captions">
+    <div class="cap on" id="capA"><h3>Trade show: sell the space</h3><ul><li>Revenue mainly from the sale of exhibit space</li><li>Success read in square metres and footfall</li><li>Exhibitors engage mostly from their booth</li></ul></div>
+    <div class="cap off" id="capB"><h3>ConEx: curate the room</h3><ul><li>Revenue mainly from sponsorship packages and bespoke activations</li><li>Success read in who is in the room</li><li>Curated meetings, hosted buyers and off-booth activations</li></ul></div>
+  </div>
+  <blockquote>“Instead we think about relationships and who needs to be in that room and what they do once they’re in there.”<cite>Jay Weintraub, Founder and CEO, Connectiv</cite></blockquote>
+</div>
+<script>
+(()=>{
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=0,H=0,dpr=1,portrait=false,stands=[],aisles=[],people=[],clusters=[];
+let t=0,target=0,from=0,animStart=0,animDur=0,played=false;
+const rnd=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(42);
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const N=54;
+// stable per-person randoms
+const seeds=Array.from({length:N},()=>({a:rnd(),b:rnd(),c:rnd(),d:rnd(),sp:.02+rnd()*.05}));
+
+function layout(){
+  const w=cv.parentElement.clientWidth; portrait=w<620;
+  W=w; H=Math.round(w*(portrait?1.05:.56)); dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.height=H+'px'; ctx.setTransform(dpr,0,0,dpr,0,0);
+  const x0=W*.06,x1=W*.94,y0=H*.12,y1=H*.92,cols=portrait?4:6,rows=portrait?5:3;
+  const ax=(x1-x0)*.05,ay=(y1-y0)*(portrait?.05:.09);
+  const sw=((x1-x0)-(cols+1)*ax)/cols, sh=((y1-y0)-(rows+1)*ay)/rows;
+  stands=[];aisles=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    // occasional double-size stand, as on a real floorplan
+    stands.push({x:x0+ax+c*(sw+ax),y:y0+ay+r*(sh+ay),w:sw,h:sh});
+  }
+  for(let c=0;c<=cols;c++){const x=x0+ax/2+c*(sw+ax);aisles.push({x1:x,y1:y0,x2:x,y2:y1});}
+  for(let r=0;r<=rows;r++){const y=y0+ay/2+r*(sh+ay);aisles.push({x1:x0,y1:y,x2:x1,y2:y});}
+  const u=Math.min(W,H);
+  const C=portrait?{
+    meet:[.27,.27],round:[.73,.25],dinner:[.5,.5],act:[.27,.8],sess:[.73,.8]
+  }:{meet:[.13,.52],round:[.36,.32],dinner:[.38,.74],act:[.64,.34],sess:[.84,.66]};
+  const P=(k)=>[C[k][0]*W,C[k][1]*H];
+  const slots=[];clusters=[];
+  // 1:1 meetings: 5 pairs
+  {const [cx,cy]=P('meet');const g=u*.065;for(let i=0;i<5;i++){const yy=cy+(i-2)*g*(portrait?.55:1);const xx=cx+(portrait?(i%2?1:-1)*u*.06:0);slots.push({x:xx-u*.022,y:yy,k:'meet',pair:i});slots.push({x:xx+u*.022,y:yy,k:'meet',pair:i});}
+   clusters.push({k:'meet',x:cx,y:cy-(portrait?u*.16:u*.19),label:'1:1 meetings'});}
+  // roundtable of 8
+  {const [cx,cy]=P('round');const r=u*.075;for(let i=0;i<8;i++){const a=i/8*Math.PI*2;slots.push({x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r,k:'round',i});}
+   clusters.push({k:'round',x:cx,y:cy-u*.13,label:'Roundtable',table:{x:cx,y:cy,r:r*.55}});}
+  // dinner: two rows of 6
+  {const [cx,cy]=P('dinner');const L=u*(portrait?.34:.26),g=u*.05;for(let i=0;i<6;i++){const xx=cx-L/2+i*L/5;slots.push({x:xx,y:cy-g,k:'dinner',i,row:0});slots.push({x:xx,y:cy+g,k:'dinner',i,row:1});}
+   clusters.push({k:'dinner',x:cx,y:cy-u*.11,label:'Hosted dinner',bar:{x:cx-L/2-6,y:cy-g*.35,w:L+12,h:g*.7}});}
+  // activation: loose group of 10
+  {const [cx,cy]=P('act');for(let i=0;i<10;i++){const a=seeds[i].a*Math.PI*2,r=u*(.02+seeds[i].b*.07);slots.push({x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r*.8,k:'act',i});}
+   clusters.push({k:'act',x:cx,y:cy-u*.13,label:'Off-booth activation',hub:{x:cx,y:cy}});}
+  // session: arc rows facing a stage
+  {const [cx,cy]=P('sess');for(let i=0;i<14;i++){const row=i<7?0:1,j=row?i-7:i;const a=Math.PI*(.18+.64*j/6);const r=u*(.09+row*.05);slots.push({x:cx+Math.cos(a)*r*1.15,y:cy-u*.05+Math.sin(a)*r,k:'sess',i});}
+   clusters.push({k:'sess',x:cx,y:cy-u*.11,label:'Curated session',stage:{x:cx-u*.05,y:cy-u*.075,w:u*.1,h:5}});}
+  people=slots.slice(0,N).map((s,i)=>{const al=aisles[Math.floor(seeds[i].c*aisles.length)];return{b:s,al,s0:seeds[i].d,sp:seeds[i].sp,delay:seeds[i].a*.35}});
+  draw(performance.now());
+}
+
+const col=(k)=>({meet:'#8E7BFF',round:'#6F9BFF',dinner:'#4FC7E6',act:'#33E1D5',sess:'#5EE6C0'}[k]);
+function posA(p,now){const a=p.al;let s=(p.s0+(rm?0:now/1000*p.sp))%1;return{x:a.x1+(a.x2-a.x1)*s,y:a.y1+(a.y2-a.y1)*s};}
+function draw(now){
+  ctx.clearRect(0,0,W,H);
+  const fa=1-ease(Math.min(1,t*1.6));
+  // stands
+  ctx.lineWidth=1;
+  stands.forEach((s,i)=>{const sc=1-.25*(1-fa);const cx=s.x+s.w/2,cy=s.y+s.h/2;const w=s.w*sc,h=s.h*sc;
+    ctx.globalAlpha=fa*.9;ctx.fillStyle='rgba(114,90,255,.10)';ctx.strokeStyle='rgba(142,154,192,.45)';
+    ctx.beginPath();ctx.rect(cx-w/2,cy-h/2,w,h);ctx.fill();ctx.stroke();
+    if(fa>.3&&s.w>46){ctx.globalAlpha=fa*.55;ctx.fillStyle='#8E9AC0';ctx.font='500 10px Inter, sans-serif';ctx.textAlign='center';ctx.fillText('m²',cx,cy+3);}
+  });
+  // aisles hint
+  ctx.globalAlpha=fa*.25;ctx.strokeStyle='#8E9AC0';ctx.setLineDash([2,6]);
+  aisles.forEach(a=>{ctx.beginPath();ctx.moveTo(a.x1,a.y1);ctx.lineTo(a.x2,a.y2);ctx.stroke();});
+  ctx.setLineDash([]);
+  // positions
+  const pts=people.map(p=>{const k=Math.max(0,Math.min(1,(t-p.delay*.6)/(1-p.delay*.6)));const e=ease(k);const A=posA(p,now);const wob=rm?0:Math.sin(now/900+p.s0*20)*1.2*e;return{x:A.x+(p.b.x-A.x)*e+wob,y:A.y+(p.b.y-A.y)*e,e,p};});
+  const fb=ease(Math.max(0,(t-.45)/.55));
+  // furniture
+  ctx.globalAlpha=fb;
+  clusters.forEach(c=>{ctx.strokeStyle='rgba(51,225,213,.35)';ctx.fillStyle='rgba(51,225,213,.06)';
+    if(c.table){ctx.beginPath();ctx.arc(c.table.x,c.table.y,c.table.r,0,7);ctx.fill();ctx.stroke();}
+    if(c.bar){ctx.beginPath();ctx.roundRect?ctx.roundRect(c.bar.x,c.bar.y,c.bar.w,c.bar.h,4):ctx.rect(c.bar.x,c.bar.y,c.bar.w,c.bar.h);ctx.fill();ctx.stroke();}
+    if(c.stage){ctx.fillStyle='rgba(51,225,213,.7)';ctx.fillRect(c.stage.x,c.stage.y,c.stage.w,c.stage.h);}
+  });
+  // connections
+  ctx.lineWidth=1.1;
+  const link=(a,b,al)=>{ctx.globalAlpha=al;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();};
+  ctx.strokeStyle='#33E1D5';
+  const by=k=>pts.filter(q=>q.p.b.k===k);
+  if(fb>0){
+    const m=by('meet');for(let i=0;i<m.length;i+=2)link(m[i],m[i+1],fb*.9);
+    const r=by('round');r.forEach((q,i)=>{link(q,r[(i+1)%r.length],fb*.55);if(i<4)link(q,r[i+4],fb*.25);});
+    const d=by('dinner');d.forEach((q,i)=>{if(q.p.b.row===0){const o=d.find(z=>z.p.b.row===1&&z.p.b.i===q.p.b.i);if(o)link(q,o,fb*.5);}});
+    const a=by('act');const hub=clusters.find(c=>c.k==='act').hub;a.forEach(q=>link(q,hub,fb*.35));
+    const s=by('sess');const st=clusters.find(c=>c.k==='sess').stage;s.forEach((q,i)=>{if(i%2===0)link(q,{x:st.x+st.w/2,y:st.y},fb*.22);});
+    // ecosystem links between groups
+    ctx.setLineDash([3,5]);ctx.strokeStyle='#725AFF';
+    [[ 'meet',1,'round',2],['round',5,'act',3],['dinner',3,'round',6],['act',7,'sess',2],['dinner',10,'sess',9],['meet',6,'dinner',0]].forEach(([k1,i1,k2,i2])=>{const A=by(k1)[i1],B=by(k2)[i2];if(A&&B)link(A,B,fb*.55);});
+    ctx.setLineDash([]);
+  }
+  // people
+  pts.forEach(q=>{ctx.globalAlpha=1;const c=q.e>.5?col(q.p.b.k):'#B9C3E6';ctx.fillStyle=c;ctx.beginPath();ctx.arc(q.x,q.y,portrait?3.2:3.6,0,7);ctx.fill();
+    if(q.e>.95){ctx.globalAlpha=.18*fb;ctx.beginPath();ctx.arc(q.x,q.y,8,0,7);ctx.fill();}});
+  // labels
+  ctx.globalAlpha=ease(Math.max(0,(t-.75)/.25));ctx.fillStyle='#E9EEFA';ctx.textAlign='center';ctx.font=`600 ${portrait?11:12}px Inter, sans-serif`;
+  clusters.forEach(c=>ctx.fillText(c.label,c.x,c.y));
+  ctx.globalAlpha=1;
+}
+
+const bA=document.getElementById('bA'),bB=document.getElementById('bB'),rng=document.getElementById('t'),
+  capA=document.getElementById('capA'),capB=document.getElementById('capB'),ml=document.getElementById('modeLabel');
+function syncUI(){const on=t>=.5;bA.setAttribute('aria-pressed',!on);bB.setAttribute('aria-pressed',on);
+  capA.className='cap '+(on?'off':'on');capB.className='cap '+(on?'on':'off');ml.textContent=on?'The room':'The hall plan';
+  if(document.activeElement!==rng)rng.value=Math.round(t*1000);}
+function go(to,dur){if(rm){t=to;syncUI();return;}from=t;target=to;animStart=performance.now();animDur=dur*Math.abs(to-t);}
+function loop(now){
+  if(animDur>0){const k=Math.min(1,(now-animStart)/animDur);t=from+(target-from)*k;if(k>=1)animDur=0;syncUI();}
+  draw(now);requestAnimationFrame(loop);
+}
+bA.onclick=()=>{played=true;go(0,1800)};bB.onclick=()=>{played=true;go(1,1800)};
+rng.oninput=()=>{played=true;animDur=0;t=rng.value/1000;syncUI();};
+new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!played){played=true;setTimeout(()=>go(1,3400),700);}}),{threshold:.45}).observe(cv);
+addEventListener('resize',layout);
+layout();syncUI();requestAnimationFrame(loop);
+// tell a host page our height
+const post=()=>{try{parent.postMessage({source:'conex-visual',id:'space-to-outcomes',height:document.documentElement.scrollHeight},'*')}catch(e){}};
+new ResizeObserver(post).observe(document.body);post();
+})();
+</script>
+</body>
+</html>
