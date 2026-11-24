@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Space or access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: the conclusion's argument as two panels. Left, space: a measured stand with a crowd streaming past and a footfall counter running. Right, access: a room filling one invited person at a time. Under each, the measures that follow from what is being sold. Tokens mirror explori.com/conex. */
+:root{
+  --bg:#0A0F1E; --panel:#10172B; --line:rgba(148,163,210,.16); --fg:#E9EEFA; --muted:#8E9AC0;
+  --teal:#33E1D5; --violet:#725AFF; --grey:#6E7AA0;
+  --display:'Poppins',ui-sans-serif,system-ui,sans-serif; --body:'Inter',ui-sans-serif,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding-block:8px 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:600 12px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+h2{font:700 clamp(22px,3.2vw,32px)/1.15 var(--display);margin:10px 0 20px;text-wrap:balance;letter-spacing:-.01em}
+h2 span{background:linear-gradient(90deg,var(--violet),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.card{border:1px solid var(--line);border-radius:18px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column}
+.card.access{background:radial-gradient(120% 80% at 50% 0%,rgba(114,90,255,.16),transparent 60%),var(--panel)}
+.hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:16px 18px 0}
+.hd b{font:700 22px/1 var(--display)}
+.space .hd b{color:#AEB8D6}.access .hd b{color:var(--teal)}
+.hd small{color:var(--muted);font-size:12px}
+svg{display:block;width:100%;height:auto}
+.count{padding:0 18px;display:flex;align-items:baseline;gap:10px;margin-top:-4px}
+.count strong{font:700 30px/1 var(--display);font-variant-numeric:tabular-nums}
+.space .count strong{color:#AEB8D6}.access .count strong{color:var(--teal)}
+.count span{color:var(--muted);font-size:13px}
+.meas{margin:14px 18px 18px;border-top:1px solid var(--line);padding-top:12px}
+.meas .lab{font:600 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.meas ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.meas li{border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:13px}
+.access .meas li{border-color:rgba(51,225,213,.35)}
+.close{margin-top:16px;border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between;background:var(--panel)}
+.close p{margin:0;font:600 clamp(16px,2vw,19px)/1.4 var(--display);max-width:60ch;text-wrap:balance}
+.close small{color:var(--muted);font-size:12px}
+.role{font:600 9.5px Inter,sans-serif;letter-spacing:.06em;fill:var(--teal);opacity:0;transition:opacity .6s}
+.role.on{opacity:1}
+@media (max-width:760px){.pair{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.role{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">In conclusion</div>
+  <h2>A trade show sells space. A ConEx sells <span>access</span>.</h2>
+  <div class="pair">
+    <div class="card space">
+      <div class="hd"><b>Space</b><small>What the trade show sold</small></div>
+      <svg viewBox="0 0 440 230" id="sv" aria-label="A measured stand with a crowd walking past it">
+        <defs><marker id="ar" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8Z" fill="#8E9AC0"/></marker></defs>
+        <rect x="0" y="0" width="440" height="230" fill="#0E1528"/>
+        <g stroke="#1E2844" stroke-width="1">
+          <path d="M0 40H440M0 80H440M0 120H440M0 160H440M0 200H440M40 0V230M80 0V230M120 0V230M160 0V230M200 0V230M240 0V230M280 0V230M320 0V230M360 0V230M400 0V230"/></g>
+        <rect x="160" y="40" width="120" height="80" fill="#1F2A48" stroke="#AEB8D6" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="220" y="86" text-anchor="middle" fill="#AEB8D6" font-family="Poppins,sans-serif" font-weight="700" font-size="20">9 m²</text>
+        <path d="M160 30 H280" stroke="#8E9AC0" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+        <text x="220" y="24" text-anchor="middle" fill="#8E9AC0" font-family="Inter,sans-serif" font-size="11">3 m</text>
+        <path d="M290 40 V120" stroke="#8E9AC0" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+        <text x="300" y="84" fill="#8E9AC0" font-family="Inter,sans-serif" font-size="11">3 m</text>
+        <rect x="0" y="140" width="440" height="56" fill="#121B33"/>
+        <text x="10" y="216" fill="#5B6787" font-family="Inter,sans-serif" font-size="10" letter-spacing="1.5">AISLE</text>
+        <g id="crowd"></g>
+      </svg>
+      <div class="count"><strong id="foot">0</strong><span>walked past the stand</span></div>
+      <div class="meas"><div class="lab">So the measures followed</div><ul><li>Square metres</li><li>Footfall</li><li>How many people walked past a stand</li></ul></div>
+    </div>
+    <div class="card access">
+      <div class="hd"><b>Access</b><small>What a ConEx sells</small></div>
+      <svg viewBox="0 0 440 230" id="av" aria-label="A room filling with invited people one at a time">
+        <rect x="0" y="0" width="440" height="230" fill="#0F1430"/>
+        <circle cx="220" cy="112" r="86" fill="rgba(114,90,255,.10)" stroke="#725AFF" stroke-width="2"/>
+        <path d="M206 198 h28" stroke="#0F1430" stroke-width="8"/>
+        <path d="M206 198 v12 M234 198 v12" stroke="#33E1D5" stroke-width="2"/>
+        <g id="links"></g><g id="room"></g>
+        <text x="220" y="226" text-anchor="middle" fill="#5B6787" font-family="Inter,sans-serif" font-size="10" letter-spacing="1.5">BY INVITATION OR PASS</text>
+      </svg>
+      <div class="count"><strong id="inroom">0</strong><span>in a room assembled on purpose</span></div>
+      <div class="meas"><div class="lab">So the measures follow</div><ul><li>Who is in the room</li><li>Audience composition</li><li>Retention</li></ul></div>
+    </div>
+  </div>
+  <div class="close"><p>“Satisfaction with a curated room and satisfaction with an open hall are measuring two different products.” Each should be held to the standard of its own kind.</p><small>From the paper’s conclusion</small></div>
+</div>
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg',el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// crowd streaming along the aisle
+const crowd=document.getElementById('crowd'),foot=document.getElementById('foot');let passed=0;
+const walkers=[];for(let i=0;i<26;i++){const c=el('circle',{r:4,fill:'#6E7AA0'});crowd.appendChild(c);walkers.push({c,x:Math.random()*440,y:150+Math.random()*40,v:.7+Math.random()*.7,dir:i%3===0?-1:1,counted:false});}
+
+// room filling one by one
+const seats=[];const R=54;const roles=['Buyer','C-suite','Investor','Sponsor','Buyer','C-suite','Founder','Buyer','Partner'];
+for(let i=0;i<9;i++){const a=-Math.PI/2+i*2*Math.PI/9;seats.push([220+R*Math.cos(a),112+R*Math.sin(a)]);}
+const room=document.getElementById('room'),links=document.getElementById('links'),inroom=document.getElementById('inroom');
+const guests=seats.map((s,i)=>{const g=el('g',{});const c=el('circle',{cx:220,cy:206,r:6,fill:'#33E1D5',opacity:0});const a=-Math.PI/2+i*2*Math.PI/9,lx=220+(R+24)*Math.cos(a),ly=112+(R+20)*Math.sin(a)+3;const t=el('text',{x:lx.toFixed(1),y:ly.toFixed(1),'text-anchor':Math.abs(Math.cos(a))<.3?'middle':(Math.cos(a)>0?'start':'end'),class:'role'});t.textContent=roles[i];g.appendChild(c);g.appendChild(t);room.appendChild(g);return {c,t,s,in:false};});
+let started=false,t0=0,last=0,joined=0;
+function frame(ts){if(!t0)t0=ts;const dt=Math.min(40,ts-(last||ts));last=ts;
+  walkers.forEach(w=>{w.x+=w.v*w.dir*dt*.16;if(w.dir>0&&w.x>460){w.x=-20;w.counted=false;}if(w.dir<0&&w.x<-20){w.x=460;w.counted=false;}
+    if(!w.counted&&Math.abs(w.x-220)<4){w.counted=true;passed++;}w.c.setAttribute('cx',w.x.toFixed(1));w.c.setAttribute('cy',w.y.toFixed(1));});
+  foot.textContent=passed.toLocaleString('en-GB');
+  const el2=ts-t0;const want=Math.min(9,Math.floor(el2/900));
+  while(joined<want){const g=guests[joined];g.in=true;g.start=ts;joined++;}
+  guests.forEach((g,i)=>{if(!g.in)return;const p=Math.min(1,(ts-g.start)/700);const e=1-Math.pow(1-p,3);
+    const x=220+(g.s[0]-220)*e,y=206+(g.s[1]-206)*e;g.c.setAttribute('cx',x.toFixed(1));g.c.setAttribute('cy',y.toFixed(1));g.c.setAttribute('opacity',Math.min(1,p*2));
+    if(p===1&&!g.t.classList.contains('on')){g.t.classList.add('on');for(let j=0;j<i;j++){if(Math.random()<.55){links.appendChild(el('line',{x1:g.s[0],y1:g.s[1],x2:guests[j].s[0],y2:guests[j].s[1],stroke:'#725AFF','stroke-width':1.2,opacity:.55}));}}}});
+  inroom.textContent=guests.filter(g=>g.t.classList.contains('on')).length;
+  requestAnimationFrame(frame);}
+function finalState(){passed=1240;foot.textContent=passed.toLocaleString('en-GB');walkers.forEach(w=>{w.c.setAttribute('cx',w.x<0?((w.x%440)+440)%440:w.x);w.c.setAttribute('cy',w.y);});
+  guests.forEach((g,i)=>{g.c.setAttribute('cx',g.s[0]);g.c.setAttribute('cy',g.s[1]);g.c.setAttribute('opacity',1);g.t.classList.add('on');for(let j=0;j<i;j++)if((i+j)%2)links.appendChild(el('line',{x1:g.s[0],y1:g.s[1],x2:guests[j].s[0],y2:guests[j].s[1],stroke:'#725AFF','stroke-width':1.2,opacity:.55}));});inroom.textContent=9;}
+if(rm)finalState();
+else new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting&&!started){started=true;o.disconnect();requestAnimationFrame(frame);}}),{threshold:.4}).observe(document.querySelector('.pair'));
+function post(){try{parent.postMessage({source:'conex-visual',id:'space-access',height:document.documentElement.scrollHeight},'*')}catch(e){}}
+new ResizeObserver(post).observe(document.body);post();
+})();
+</script>
+</body>
+</html>
