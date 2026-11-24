@@ -39,9 +39,9 @@ h2{font:700 clamp(22px,3.2vw,32px)/1.15 var(--display);margin:10px 0 6px;text-wr
 .axis{display:grid;grid-template-columns:var(--label) 1fr;gap:16px;margin-top:6px}
 .ticks{position:relative;height:24px;color:var(--muted);font:500 12px/1 var(--body);font-variant-numeric:tabular-nums}
 .ticks span{position:absolute;top:8px;transform:translateX(-50%)}
-.detail{margin-top:18px;border-left:2px solid var(--teal);padding:2px 0 2px 16px;min-height:66px}
-.detail p{margin:0;font:500 16px/1.5 var(--display);max-width:64ch}
-.detail small{display:block;margin-top:6px;color:var(--muted);font:400 12px/1.4 var(--body)}
+.detail{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;min-height:52px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.detail b{font:600 13px/1.4 var(--body);color:var(--teal);white-space:nowrap}
+.detail p{margin:0;font:400 14px/1.5 var(--body);color:var(--fg);max-width:70ch;flex:1 1 300px}
 .row[aria-pressed="true"] .name{color:var(--teal)}
 .note{margin-top:14px;color:var(--muted);font-size:12px}
 @media (max-width:640px){
@@ -68,19 +68,19 @@ h2{font:700 clamp(22px,3.2vw,32px)/1.15 var(--display);margin:10px 0 6px;text-wr
       <button class="row" data-i="3" aria-pressed="false"><span><span class="name">Ai4</span><span class="kind">CloserStill · AI</span></span><span class="track"><span class="bar" data-min="2000" data-max="6000"></span><span class="val" data-at="6000">$2K–$6K</span></span></button>
     </div>
     <div class="axis"><div></div><div class="ticks" id="ticks"></div></div>
+    <div class="detail" id="detail" aria-live="polite"><b></b><p></p></div>
   </div>
-  <div class="detail" id="detail" aria-live="polite"><p></p><small></small></div>
-  <div class="note">Prices as reported in The emergence of the ConEx. The white mark on Money20/20 is the standard pass.</div>
+  <div class="note">White mark: Money20/20 USA standard pass.</div>
 </div>
 <script>
 (()=>{
 const MAX=6600; // axis runs a little past $6K so the "+" has room
 const pct=v=>v/MAX*100;
 const details=[
-  ["Usually there is no charge or a nominal entry fee for attendees.","Distinctions between trade shows and ConExs"],
-  ["Jay Weintraub’s shows are $1-2K to attend.","Chapter 3"],
-  ["According to the Money20/20 website, passes for Money20/20 USA range from around $1,500 to $6,000, with the standard pass at just over $4,000.","Chapter 3"],
-  ["With breakfasts, lunches, summits, meetups, training and after-parties, the delegate pass is anywhere between $2K and $6K.","Phil Soar on Ai4, chapter 3"]
+  ["Typical trade show","Usually there is no charge or a nominal entry fee for attendees."],
+  ["Connectiv events","Jay Weintraub’s shows are $1K–$2K to attend."],
+  ["Money20/20 USA","Passes range from around $1,500 to $6,000, with the standard pass at just over $4,000."],
+  ["Ai4","With breakfasts, lunches, summits, meetups, training and after-parties, the delegate pass is anywhere between $2K and $6K."]
 ];
 const grid=document.getElementById('grid'),rows=[...grid.querySelectorAll('.row')];
 // place bars, ticks and values on the shared scale
@@ -97,8 +97,8 @@ band.style.transform='scaleX(0)';
 // axis ticks
 const tk=document.getElementById('ticks');[0,1000,2000,3000,4000,5000,6000].forEach(v=>{const s=document.createElement('span');s.style.left=pct(v)+'%';s.textContent=v?`$${v/1000}K${v===6000?'+':''}`:'$0';tk.appendChild(s);});
 // detail panel
-const dp=document.querySelector('#detail p'),ds=document.querySelector('#detail small');
-function pick(i){rows.forEach((r,j)=>r.setAttribute('aria-pressed',j===i));dp.textContent='“'+details[i][0]+'”';ds.textContent='The emergence of the ConEx · '+details[i][1];}
+const dp=document.querySelector('#detail p'),db=document.querySelector('#detail b');
+function pick(i){rows.forEach((r,j)=>r.setAttribute('aria-pressed',j===i));db.textContent=details[i][0];dp.textContent=details[i][1];}
 rows.forEach((r,i)=>{r.addEventListener('click',()=>pick(i));r.addEventListener('mouseenter',()=>pick(i));});
 pick(0);
 // reveal when visible
